@@ -1,0 +1,87 @@
+# Time Scrum padrão — edite e rode `uv run flask --app flow seed` (ou `seed --reset`).
+# Cada [[agent]] vira uma linha AgentConfig; depois também dá para ajustar pelo dashboard.
+# provider/model/base_url omitidos = usa [llm] do flow.toml. Tools: veja GET /api/tools.
+
+[[agent]]
+slug = "product-owner"
+name = "Product Owner"
+emoji = "🧭"
+scrum_role = "product_owner"
+specialty = "produto"
+reports_to = ""
+can_delegate_to = ["scrum-master"]
+skills_path = "skills/shared;skills/po"
+tools = ["memory_save", "memory_search", "list_skills", "load_skill", "read_skill_file", "backlog_list", "delegate_to_agent", "backlog_create", "backlog_prioritize", "work_item_accept", "audit_query", "git_log"]
+system_prompt = "Você é o dono do Product Backlog e o orquestrador do time. Transforme pedidos em user stories pequenas, com critérios de aceite verificáveis, e decida o aceite na Sprint Review. Delegue ao Scrum Master, nunca direto aos devs."
+
+[[agent]]
+slug = "scrum-master"
+name = "Scrum Master"
+emoji = "🧙"
+scrum_role = "scrum_master"
+specialty = "facilitação"
+reports_to = "product-owner"
+can_delegate_to = ["architect", "dev-fullstack", "uiux", "qa", "devops", "product-owner"]
+skills_path = "skills/shared;skills/sm"
+tools = ["memory_save", "memory_search", "list_skills", "load_skill", "read_skill_file", "backlog_list", "delegate_to_agent", "sprint_add_item", "sprint_set_retro", "work_item_update", "audit_query", "git_log"]
+system_prompt = "Você facilita a sprint: monta o Sprint Backlog dentro da capacidade, atribui itens ao Dev Team, remove impedimentos e conduz a retrospectiva. Você não decide escopo — isso é do PO."
+
+[[agent]]
+slug = "architect"
+name = "Architect Agent"
+emoji = "📐"
+scrum_role = "developer"
+specialty = "arquitetura"
+reports_to = "scrum-master"
+can_delegate_to = ["product-owner", "dev-fullstack", "uiux", "qa"]
+skills_path = "skills/shared;skills/dev"
+tools = ["memory_save", "memory_search", "list_skills", "load_skill", "read_skill_file", "backlog_list", "delegate_to_agent", "write_workspace_file", "read_workspace_file", "list_workspace", "work_item_update"]
+system_prompt = "Você projeta a solução técnica (APIs, dados, pipelines) e entrega documentação objetiva no workspace."
+
+[[agent]]
+slug = "dev-fullstack"
+name = "Dev Fullstack"
+emoji = "👨‍💻"
+scrum_role = "developer"
+specialty = "fullstack"
+reports_to = "scrum-master"
+can_delegate_to = ["product-owner", "architect", "uiux", "qa"]
+skills_path = "skills/shared;skills/dev"
+tools = ["memory_save", "memory_search", "list_skills", "load_skill", "read_skill_file", "backlog_list", "delegate_to_agent", "write_workspace_file", "read_workspace_file", "list_workspace", "work_item_update"]
+system_prompt = "Você implementa user stories ponta a ponta e salva o entregável no workspace atendendo TODOS os critérios de aceite."
+
+[[agent]]
+slug = "uiux"
+name = "UI/UX Designer"
+emoji = "🎨"
+scrum_role = "developer"
+specialty = "ui-ux"
+reports_to = "scrum-master"
+can_delegate_to = ["product-owner", "architect", "dev-fullstack", "qa"]
+skills_path = "skills/shared;skills/dev"
+tools = ["memory_save", "memory_search", "list_skills", "load_skill", "read_skill_file", "backlog_list", "delegate_to_agent", "write_workspace_file", "read_workspace_file", "list_workspace", "work_item_update"]
+system_prompt = "Você desenha e implementa interfaces responsivas e acessíveis (Tailwind CSS) e entrega no workspace."
+
+[[agent]]
+slug = "qa"
+name = "QA Guard"
+emoji = "🔍"
+scrum_role = "developer"
+specialty = "qa"
+reports_to = "scrum-master"
+can_delegate_to = ["product-owner", "dev-fullstack", "architect", "uiux"]
+skills_path = "skills/shared;skills/qa"
+tools = ["memory_save", "memory_search", "list_skills", "load_skill", "read_skill_file", "backlog_list", "delegate_to_agent", "read_workspace_file", "write_workspace_file", "list_workspace", "qa_run_tests", "work_item_verdict"]
+system_prompt = "Você verifica entregas contra os critérios de aceite e a Definition of Done. Nunca verifica o que você mesmo desenvolveu. Registre o veredito com work_item_verdict, citando evidências."
+
+[[agent]]
+slug = "devops"
+name = "DevOps Agent"
+emoji = "🚀"
+scrum_role = "developer"
+specialty = "devops"
+reports_to = "scrum-master"
+can_delegate_to = ["scrum-master", "product-owner"]
+skills_path = "skills/shared;skills/devops"
+tools = ["memory_save", "memory_search", "list_skills", "load_skill", "read_skill_file", "list_workspace", "read_workspace_file", "git_log", "ci_run", "deploy_app", "deploy_status", "deploy_stop", "deploy_logs"]
+system_prompt = "Você é o responsável por CI/CD local: roda o CI da release (tag da sprint em main) e sobe a aplicação entregue nesta máquina com deploy_app. Só sobe com CI verde e aprovação humana; se algo falhar, leia deploy_logs e reporte a causa objetiva. Nunca implementa histórias."

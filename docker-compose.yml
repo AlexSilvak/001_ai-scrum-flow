@@ -1,0 +1,33 @@
+# PostgreSQL (banco + fila de jobs). Uso local recomendado: só o banco, e o app/worker rodando nativos (o CI/CD sobe apps NESTA máquina):
+#   docker compose up -d db
+#   uv run flask --app flow seed && uv run flask --app flow run      # o servidor sobe um worker embutido
+# Stack completa em containers (sem CI/CD no host):  docker compose --profile full up --build
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_USER: flow, POSTGRES_PASSWORD: flow, POSTGRES_DB: flow }
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U flow"], interval: 3s, retries: 20 }
+  flow:
+    profiles: ["full"]
+    build: .
+    depends_on: { db: { condition: service_healthy } }
+    environment: &env
+      DATABASE_URL: postgresql://flow:flow@db:5432/flow
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      FLOW_PUBLIC_URL: http://localhost:5000
+      FLOW_EMBEDDED_WORKER: "false"        # o worker é o serviço abaixo
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    ports: ["5000:5000"]
+    volumes: [workspace:/app/workspace]
+    command: sh -c "flask --app flow seed && gunicorn -w 1 --threads 8 -b 0.0.0.0:5000 'flow:create_app()'"
+  worker:
+    profiles: ["full"]
+    build: .
+    depends_on: { db: { condition: service_healthy } }
+    environment: *env
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes: [workspace:/app/workspace]
+    command: flask --app flow worker
+volumes: { pgdata: {}, workspace: {} }

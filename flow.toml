@@ -1,0 +1,57 @@
+# Configuração do AI Scrum Flow. Variáveis de ambiente (ou .env) sempre vencem este arquivo.
+
+[database]
+# Somente PostgreSQL (banco + fila de jobs). Instale o PostgreSQL 14+ nativo (veja o README, “Banco”)
+url = "postgresql://flow:flow@localhost:5432/flow"
+
+[llm]
+default_provider = "ollama"      # ollama | openai | anthropic | mock (offline)
+default_model    = "gemma3:4b"   # qualquer modelo baixado no Ollama (ollama list)
+ollama_base_url  = "http://localhost:11434"
+
+[paths]
+workspace   = "workspace"        # entregáveis dos agentes (um sandbox por sprint)
+skills_path = "skills"           # padrão; cada agente pode ter o seu (campo skills_path)
+team        = "team.toml"        # definição do time usada pelo `seed`
+
+[a2a]
+public_url   = "http://localhost:5000"  # aparece no Agent Card
+bearer_token = ""                       # vazio = sem autenticação (apenas dev)
+
+[git]
+enabled = true   # o workspace vira um repositório: branch por sprint e por história, 1 commit por etapa, tag por sprint
+
+[cd]
+enabled        = true    # CI/CD local: o agente devops roda o CI e sobe a aplicação nesta máquina
+auto_deploy    = false   # false = o humano aprova no dashboard antes de subir (recomendado: o código vem de um LLM)
+port_range     = [8100, 8199]
+start_timeout_s = 25
+step_timeout_s  = 300
+# Só estes executáveis podem ser usados nos comandos do flow-app.toml (sem shell, sem rm/curl/bash):
+allowed_commands = ["python", "python3", "pip", "uv", "pytest", "node", "npm", "npx", "flask", "gunicorn", "uvicorn"]
+
+[sandbox]
+# O QA valida cada história rodando pytest num container descartável (uv): sem rede, raiz somente leitura, memória/CPU/pids limitados.
+enabled           = true
+mode              = "auto"        # auto = Docker se o daemon responder, senão subprocesso local (SEM isolamento); docker = exige Docker; local = nunca usa Docker
+allow_local_fallback = true
+require_code      = true          # história sem nenhum arquivo de código (só entrega.md) volta ao dev sem nem acionar o QA
+image             = "flow-sandbox:1"   # construída automaticamente na 1ª execução (python:3.12-slim + uv + flask + pytest)
+memory            = "512m"
+cpus              = "1"
+pids              = 128
+test_timeout_s    = 120
+# Testes de navegador (Playwright): imagem própria com Chromium, construída na 1ª vez que uma história tiver teste com playwright.
+e2e_image         = "flow-sandbox-e2e:1"
+e2e_memory        = "1g"
+e2e_cpus          = "2"
+e2e_pids          = 512
+e2e_timeout_s     = 180
+install_timeout_s = 300
+# A instalação de dependências é a única etapa com rede. Só estes pacotes (nomes PEP 503); outros bloqueiam a execução até um humano incluí-los aqui.
+allowed_packages  = ["flask", "pytest", "httpx", "requests", "jinja2", "werkzeug", "itsdangerous", "markupsafe", "click", "flask-sqlalchemy", "sqlalchemy", "flask-login", "flask-wtf", "wtforms", "email-validator", "bcrypt", "pydantic", "python-dotenv", "pytest-flask", "playwright", "pytest-playwright"]
+
+[worker]
+# Fila de jobs (procrastinate, sobre o PostgreSQL): refinamento, sprint, CI e deploy rodam no worker, não no processo web.
+embedded    = true   # true = o servidor web sobe um worker em thread (dev local). false = rode `uv run flask --app flow worker` à parte
+concurrency = 4      # jobs simultâneos (uma sprint por vez é garantido por lock)

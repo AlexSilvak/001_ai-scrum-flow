@@ -1,0 +1,33 @@
+[project]
+name = "ai-scrum-flow"
+version = "0.1.0"
+description = "Time Scrum de agentes de IA (Flask) com PO orquestrador, MCP, A2A, fila de jobs e memória em PostgreSQL, e Ollama"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1",
+    "flask-sqlalchemy>=3.1",
+    "sqlalchemy>=2.0",
+    "psycopg[binary,pool]>=3.2",
+    "httpx>=0.27",
+    "fastmcp>=2.0",
+    "gunicorn>=22",
+    "procrastinate>=3.10.0",
+]
+
+[project.scripts]
+flow-mcp = "flow.mcp_server:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytailwindcss>=0.2"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/flow"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,28 @@
+/* Tailwind CSS v4 — build:  uv run tailwindcss -i src/flow/static/css/input.css -o src/flow/static/css/app.css --minify */
+@import "tailwindcss";
+@source "../../templates";
+@source "../js";
+
+@theme {
+  --color-scrum-bg: #0b0f17;
+  --color-scrum-card: #151c28;
+  --color-scrum-accent: #3b82f6;
+  --color-scrum-purple: #8b5cf6;
+  --color-scrum-emerald: #10b981;
+  --color-scrum-amber: #f59e0b;
+  --color-scrum-rose: #f43f5e;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  :root { color-scheme: dark; }
+  input, select, textarea { @apply rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-100; }
+  input[type="checkbox"] { @apply h-3.5 w-3.5 px-0 py-0; }
+  label { @apply mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-400; }
+  button { @apply cursor-pointer; }
+  dialog { margin: auto; }  /* o preflight zera a margem e o <dialog> colaria no canto */
+}
+@layer components {
+  .chip { @apply rounded-full border border-slate-700 bg-slate-800 px-2 py-0.5 font-mono text-[10px]; }
+}
