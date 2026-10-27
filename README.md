@@ -3,9 +3,6 @@
 
 
 
-<br>
-
-<img width="1712" height="821" alt="image" src="https://github.com/user-attachments/assets/593fabf9-f2eb-4d50-88ab-f081b7f0fc34" />
 
 
 # AI Scrum Flow
