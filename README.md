@@ -1,3 +1,8 @@
+<img width="1889" height="805" alt="image" src="https://github.com/user-attachments/assets/48f7d44b-1d90-4d48-bd96-e9a9f8d9d4b7" />
+
+<img width="1712" height="821" alt="image" src="https://github.com/user-attachments/assets/593fabf9-f2eb-4d50-88ab-f081b7f0fc34" />
+
+
 # AI Scrum Flow
 
 Time Scrum de agentes de IA. O **Product Owner é o orquestrador**; ele delega ao **Scrum Master**, que coordena o **Dev Team**
@@ -179,5 +184,6 @@ Se a história tem código Python e o dev não trouxe testes, o QA escreve `test
 ### Detalhe da tarefa (painel ao vivo)
 
 Em cada agente (card da esquerda ou aba Ao vivo) há o botão **🔍 ver tarefa**. Abre o passo a passo da execução, atualizado a cada 1 s: a tarefa recebida, cada passo do modelo (com o texto que ele **está gerando agora**, em streaming no Ollama, tokens e tempo), cada ferramenta (arquivo com **nome e extensão**, escreveu/leu, tamanho, o **conteúdo escrito** e o resultado), as fases do sandbox (instalando dependências, rodando pytest) e a saída completa dos testes. À esquerda: contadores, a lista de arquivos tocados e o estado do sandbox; clique para saltar até o passo. O seletor do topo escolhe uma das últimas 25 execuções do agente. Os dados ficam na tabela `agent_trace` (PostgreSQL), então o painel funciona mesmo com o worker em outro processo. Execuções com sandbox aparecem como uma execução própria ("sandbox · testes de US-xxx") do QA.
-#   0 0 1 _ a i - s c r u m - f l o w  
+#   0 0 1 _ a i - s c r u m - f l o w 
+ 
  
